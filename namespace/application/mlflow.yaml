@@ -23,11 +23,12 @@ spec:
           image:
             repository: bitnamilegacy/os-shell
         tracking:
+          service:
+            type: ClusterIP
+            ports:
+              http: 5000
           persistence:
             enabled: false
-        service:
-          type: ClusterIP
-          port: 5000
         defaultArtifactRoot: file:///mlruns
         auth:
           enabled: false
