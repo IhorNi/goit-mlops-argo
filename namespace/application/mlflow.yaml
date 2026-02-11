@@ -29,9 +29,9 @@ spec:
               http: 5000
           persistence:
             enabled: false
+          auth:
+            enabled: true
         defaultArtifactRoot: file:///mlruns
-        auth:
-          enabled: false
         postgresql:
           enabled: true
           image:
