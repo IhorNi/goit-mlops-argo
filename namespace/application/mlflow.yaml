@@ -26,6 +26,9 @@ spec:
         defaultArtifactRoot: file:///mlruns
         auth:
           enabled: false
+        volumePermissions:
+          image:
+            repository: bitnamilegacy/os-shell
         postgresql:
           enabled: true
           image:
@@ -33,15 +36,23 @@ spec:
           primary:
             persistence:
               enabled: false
+          volumePermissions:
+            image:
+              repository: bitnamilegacy/os-shell
+          metrics:
+            image:
+              repository: bitnamilegacy/postgres-exporter
         minio:
           enabled: true
           image:
             repository: bitnamilegacy/minio
+          clientImage:
+            repository: bitnamilegacy/minio-client
           persistence:
             enabled: false
-        volumePermissions:
-          image:
-            repository: bitnamilegacy/os-shell
+          volumePermissions:
+            image:
+              repository: bitnamilegacy/os-shell
   destination:
     server: https://kubernetes.default.svc
     namespace: application
