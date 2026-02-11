@@ -6,14 +6,35 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://community-charts.github.io/helm-charts
+    repoURL: https://charts.bitnami.com/bitnami
     chart: mlflow
-    targetRevision: 1.8.1
+    targetRevision: 5.2.1
     helm:
       releaseName: mlflow
       values: |
         service:
           type: ClusterIP
+          port: 5000
+        defaultArtifactRoot: file:///mlruns
+        auth:
+          enabled: false
+        postgresql:
+          enabled: true
+          primary:
+            persistence:
+              enabled: false
+          auth:
+            postgresPassword: mlflowpass
+            username: mlflow
+            password: mlflowpass
+            database: mlflowdb
+        minio:
+          enabled: true
+          persistence:
+            enabled: false
+        tracking:
+          persistence:
+            enabled: false
   destination:
     server: https://kubernetes.default.svc
     namespace: application
