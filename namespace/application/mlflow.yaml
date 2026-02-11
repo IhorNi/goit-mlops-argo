@@ -12,23 +12,25 @@ spec:
     helm:
       releaseName: mlflow
       values: |
-        tracking:
+        image:
+          repository: bitnamilegacy/mlflow
+        gitImage:
+          repository: bitnamilegacy/git
+        waitContainer:
           image:
-            repository: bitnamilegacy/mlflow
+            repository: bitnamilegacy/os-shell
+        volumePermissions:
+          image:
+            repository: bitnamilegacy/os-shell
+        tracking:
           persistence:
             enabled: false
-        run:
-          image:
-            repository: bitnamilegacy/mlflow
         service:
           type: ClusterIP
           port: 5000
         defaultArtifactRoot: file:///mlruns
         auth:
           enabled: false
-        volumePermissions:
-          image:
-            repository: bitnamilegacy/os-shell
         postgresql:
           enabled: true
           image:
