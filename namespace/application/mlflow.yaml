@@ -8,10 +8,18 @@ spec:
   source:
     repoURL: registry-1.docker.io/bitnamicharts
     chart: mlflow
-    targetRevision: 5.1.6
+    targetRevision: 5.1.17
     helm:
       releaseName: mlflow
       values: |
+        tracking:
+          image:
+            repository: bitnamilegacy/mlflow
+          persistence:
+            enabled: false
+        run:
+          image:
+            repository: bitnamilegacy/mlflow
         service:
           type: ClusterIP
           port: 5000
@@ -20,21 +28,20 @@ spec:
           enabled: false
         postgresql:
           enabled: true
+          image:
+            repository: bitnamilegacy/postgresql
           primary:
             persistence:
               enabled: false
-          auth:
-            postgresPassword: mlflowpass
-            username: mlflow
-            password: mlflowpass
-            database: mlflowdb
         minio:
           enabled: true
+          image:
+            repository: bitnamilegacy/minio
           persistence:
             enabled: false
-        tracking:
-          persistence:
-            enabled: false
+        volumePermissions:
+          image:
+            repository: bitnamilegacy/os-shell
   destination:
     server: https://kubernetes.default.svc
     namespace: application
