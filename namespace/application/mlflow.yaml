@@ -6,62 +6,49 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: registry-1.docker.io/bitnamicharts
+    repoURL: https://community-charts.github.io/helm-charts
     chart: mlflow
-    targetRevision: 5.1.17
+    targetRevision: 1.6.2
     helm:
       releaseName: mlflow
-      values: |
-        image:
-          repository: bitnamilegacy/mlflow
-        gitImage:
-          repository: bitnamilegacy/git
-        waitContainer:
-          image:
-            repository: bitnamilegacy/os-shell
-        volumePermissions:
-          image:
-            repository: bitnamilegacy/os-shell
-        tracking:
-          service:
-            type: ClusterIP
-            ports:
-              http: 5000
-          persistence:
-            enabled: false
-          auth:
-            enabled: true
-        defaultArtifactRoot: file:///mlruns
+      valuesObject:
+        service:
+          type: ClusterIP
+          port: 5000
+
+
+        auth:
+          enabled: false
+
+
         postgresql:
-          enabled: true
-          image:
-            repository: bitnamilegacy/postgresql
-          primary:
-            persistence:
-              enabled: false
-          volumePermissions:
-            image:
-              repository: bitnamilegacy/os-shell
-          metrics:
-            image:
-              repository: bitnamilegacy/postgres-exporter
-        minio:
-          enabled: true
-          image:
-            repository: bitnamilegacy/minio
-          clientImage:
-            repository: bitnamilegacy/minio-client
-          persistence:
-            enabled: false
-          volumePermissions:
-            image:
-              repository: bitnamilegacy/os-shell
+          enabled: false
+
+
+        extraEnvVars:
+          AWS_ACCESS_KEY_ID: "minio"
+          AWS_SECRET_ACCESS_KEY: "minio123"
+          MLFLOW_S3_ENDPOINT_URL: "http://minio.application.svc.cluster.local:9000"
+          MLFLOW_BACKEND_STORE_URI: "postgresql://mlflow:mlflowpass@mlflow-postgres-postgresql.application.svc.cluster.local:5432/mlflow"
+          MLFLOW_ARTIFACT_ROOT: "s3://mlflow-artifacts"
+
+
+        extraArgs:
+          backend-store-uri: "$(MLFLOW_BACKEND_STORE_URI)"
+          default-artifact-root: "$(MLFLOW_ARTIFACT_ROOT)"
+          host: "0.0.0.0"
+          port: "5000"
+
+
   destination:
-    server: https://kubernetes.default.svc
     namespace: application
+    server: https://kubernetes.default.svc
+
+
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
     syncOptions:
-      - CreateNamespace=true
+      - ServerSideApply=true
+      - SkipDryRunOnMissingResource=true
