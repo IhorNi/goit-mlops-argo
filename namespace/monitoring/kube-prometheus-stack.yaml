@@ -1,0 +1,73 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: prometheus-operator
+  namespace: infra-tools
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  destination:
+    namespace: monitoring
+    server: https://kubernetes.default.svc
+  source:
+    repoURL: https://prometheus-community.github.io/helm-charts
+    targetRevision: 75.16.1
+    chart: kube-prometheus-stack
+    helm:
+      valuesObject:
+        nameOverride: prometheus-operator
+        defaultRules:
+          create: true
+          rules:
+            cpu: true
+            memory: true
+        prometheus:
+          ingress:
+            enabled: false
+          thanosService:
+            enabled: false
+          thanosIngress:
+            enabled: false
+          prometheusSpec:
+            serviceMonitorSelector: {}
+            serviceMonitorSelectorNilUsesHelmValues: false
+            retention: 2d
+        kubelet:
+          enabled: true
+          serviceMonitor:
+            enabled: true
+        alertmanager:
+          enabled: true
+          ingress:
+            enabled: false
+          alertmanagerSpec:
+            forceEnableClusterMode: true
+        grafana:
+          ingress:
+            enabled: false
+          adminPassword: prom-operator
+        prometheusOperator:
+          admissionWebhooks:
+            enabled: false
+            patch:
+              enabled: false
+            certManager:
+              enabled: false
+            autoGenerateCert: false
+          tls:
+            enabled: false
+        kube-state-metrics:
+          prometheus:
+            monitor:
+              enabled: true
+        prometheus-node-exporter:
+          service:
+            port: 9200
+  project: default
+  syncPolicy:
+    syncOptions:
+      - Replace=true
+      - ServerSideApply=true
+    automated:
+      prune: true
+      selfHeal: true

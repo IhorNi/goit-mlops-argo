@@ -1,1 +1,6 @@
 *.xml
+experiments/.env
+__pycache__/
+*.pyc
+best_model/
+.venv/
